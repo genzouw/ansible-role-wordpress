@@ -1,0 +1,15 @@
+---
+wordpress_document_root: "/home/wp/public_html"
+httpd_user: apache
+
+wordpress_dbhost: localhost
+wordpress_dbname: "wp_db"
+wordpress_dbuser: "wp_user"
+wordpress_dbpass: "{{ wordpress_dbuser }}"
+
+wordpress_title: "Site title"
+wordpress_url: http://example.com/
+
+wordpress_admin_email: info@example.com
+wordpress_admin_user: admin
+wordpress_admin_password: password

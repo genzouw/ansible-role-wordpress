@@ -1,0 +1,35 @@
+---
+- mysql_db:
+    login_host: localhost
+    name: "{{ wordpress_dbname }}"
+    state: present
+    encoding: utf8
+    collation: utf8_general_ci
+- mysql_user:
+    login_host: localhost
+    user: "{{ wordpress_dbuser }}"
+    password: "{{ wordpress_dbpass }}"
+    priv: "{{ wordpress_dbname }}.*:all"
+
+- file: path=/usr/local/src state=directory
+- get_url: url=https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    dest=/usr/local/src/wp-cli.phar validate_certs=no mode=0755
+- file:
+    src: /usr/local/src/wp-cli.phar
+    dest: /usr/local/bin/wp
+    state: link
+
+- shell: /usr/local/bin/wp core download --locale=ja
+  sudo_user: "{{ httpd_user }}"
+  args:
+    chdir: "{{ wordpress_document_root }}"
+    creates: "{{ wordpress_document_root }}/index.php"
+- shell: '/usr/local/bin/wp core config --dbname={{ wordpress_dbname }} --dbuser={{ wordpress_dbuser }} --dbpass={{ wordpress_dbpass }} --dbhost={{ wordpress_dbhost }}'
+  sudo_user: "{{ httpd_user }}"
+  args:
+    chdir: "{{ wordpress_document_root }}"
+    creates: "{{ wordpress_document_root }}/wp-config.php"
+- shell: '/usr/local/bin/wp core install --url={{ wordpress_url }} --title="{{ wordpress_title }}" --admin_user={{ wordpress_admin_user }} --admin_password={{ wordpress_admin_password }} --admin_email={{ wordpress_admin_email }}'
+  sudo_user: "{{ httpd_user }}"
+  args:
+    chdir: "{{ wordpress_document_root }}"
