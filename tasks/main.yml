@@ -1,12 +1,12 @@
 ---
 - mysql_db:
-    login_host: localhost
+    login_host: "{{ wordpress_dbhost }}"
     name: "{{ wordpress_dbname }}"
     state: present
     encoding: utf8
     collation: utf8_general_ci
 - mysql_user:
-    login_host: localhost
+    login_host: "{{ wordpress_dbhost }}"
     user: "{{ wordpress_dbuser }}"
     password: "{{ wordpress_dbpass }}"
     priv: "{{ wordpress_dbname }}.*:all"
