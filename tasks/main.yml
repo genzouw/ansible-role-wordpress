@@ -19,17 +19,28 @@
     dest: /usr/local/bin/wp
     state: link
 
-- shell: /usr/local/bin/wp core download --locale=ja
-  sudo_user: "{{ httpd_user }}"
+- file:
+    path: "{{ wordpress_document_root }}"
+    state: directory
+    owner: "{{ httpd_user }}"
+    group: "{{ httpd_user }}"
+    mode: 0750
+    recurse: yes
+- shell: echo "{{ ansible_env.USER }}"
+- shell: /usr/local/bin/wp core download --locale=ja --allow-root
   args:
     chdir: "{{ wordpress_document_root }}"
     creates: "{{ wordpress_document_root }}/index.php"
-- shell: '/usr/local/bin/wp core config --dbname={{ wordpress_dbname }} --dbuser={{ wordpress_dbuser }} --dbpass={{ wordpress_dbpass }} --dbhost={{ wordpress_dbhost }}'
-  sudo_user: "{{ httpd_user }}"
+- shell: /usr/local/bin/wp core config --dbname={{ wordpress_dbname }} --dbuser={{ wordpress_dbuser }} --dbpass={{ wordpress_dbpass }} --dbhost={{ wordpress_dbhost }} --allow-root
   args:
     chdir: "{{ wordpress_document_root }}"
     creates: "{{ wordpress_document_root }}/wp-config.php"
-- shell: '/usr/local/bin/wp core install --url={{ wordpress_url }} --title="{{ wordpress_title }}" --admin_user={{ wordpress_admin_user }} --admin_password={{ wordpress_admin_password }} --admin_email={{ wordpress_admin_email }}'
-  sudo_user: "{{ httpd_user }}"
+- shell: /usr/local/bin/wp core install --url={{ wordpress_url }} --title="{{ wordpress_title }}" --admin_user={{ wordpress_admin_user }} --admin_password={{ wordpress_admin_password }} --admin_email={{ wordpress_admin_email }} --allow-root
   args:
     chdir: "{{ wordpress_document_root }}"
+- file:
+    path: "{{ wordpress_document_root }}"
+    state: directory
+    owner: "{{ httpd_user }}"
+    group: "{{ httpd_user }}"
+    recurse: yes
